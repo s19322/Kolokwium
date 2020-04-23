@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
+using Kolokwium1.Dto;
 using Kolokwium1.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -50,14 +51,62 @@ namespace Kolokwium1.Controllers
                         IdMedicament = (int)dr["IdMedicament"],
                         Type = dr["Type"].ToString()
                     };
-               //  pres.MedicineList.Add(med);??? nie dziala lista !!!!
+                    //  pres.MedicineList.Add(med);??? nie dziala lista !!!!
 
-                
+
+                }
             }
-        }
             return Ok(pres);
         }
-        
 
+        [HttpPost]
+        public IActionResult PostNewPrescription(PresRequest request)
+        {
+            request = new PresRequest();
+
+            request.IdPrescription = new Random().Next(4, 20000);
+            using (SqlConnection con = new SqlConnection("Data Source=db-mssql;Initial Catalog=s19322;Integrated Security=True"))
+            using (SqlCommand com = new SqlCommand())
+            {
+                com.Connection = con;
+                con.Open();
+                com.CommandText = "select IdPrescription from Prescription where IdPrescription=@IdPrescription";
+                com.Parameters.AddWithValue("IdPrescription", request.IdPrescription);
+                try
+                {
+
+                    var dr = com.ExecuteReader();
+                    if (dr.Read())
+                    {
+                        return BadRequest("This Prescription no. already exists");
+                    }
+                    else
+                    {
+
+                        int IdPrescription = request.IdPrescription;
+                        int IdDoctor = (int)dr["IdDoctor"];
+                        DateTime Date = (DateTime)dr["Date"];
+                        DateTime DueDate = (DateTime)dr["DueDate"];
+                        int IdPatient = (int)dr["IdPatient"];
+                        if (Date <= DueDate)
+                        {
+                            return BadRequest("DueDate is wrong. It should be elder ");
+                        }
+
+                        com.CommandText = "insert into Prescription values(@IdPrescription,@Date,@DueDate,@IdPatient,@IdDoctor)";
+                        com.Parameters.AddWithValue("IdPrescription", IdPrescription);
+                        com.Parameters.AddWithValue("Date", Date);
+                        com.Parameters.AddWithValue("DueDate", DueDate);
+                        com.Parameters.AddWithValue("IdPatient", IdPatient);
+                        com.Parameters.AddWithValue("IdDoctor", IdDoctor);
+                    }
+
+                }catch(SqlException slqex)
+                {
+                    Console.WriteLine(slqex);
+                }
+                return Ok();
+                }
+        }
     }
 }
