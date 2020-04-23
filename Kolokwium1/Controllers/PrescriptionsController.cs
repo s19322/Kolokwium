@@ -62,7 +62,7 @@ namespace Kolokwium1.Controllers
         [HttpPost]
         public IActionResult PostNewPrescription(PresRequest request)
         {
-            request = new PresRequest();
+            //request = new PresRequest();
 
             request.IdPrescription = new Random().Next(4, 20000);
             using (SqlConnection con = new SqlConnection("Data Source=db-mssql;Initial Catalog=s19322;Integrated Security=True"))
