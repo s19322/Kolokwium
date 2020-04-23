@@ -26,7 +26,7 @@ namespace Kolokwium1.Controllers
             {
 
 
-                //  return NotFound("Nie znaleziono studenta");
+               
                 comand.Connection = con;
                 comand.CommandText = "select * from Prescription p inner join Prescription_Medicament pm on p.IdPrescription = pm.IdPrescription inner join Medicament m on m.IdMedicament = pm.IdMedicament where p.IdPrescription=@IdPrescription";
 
@@ -51,7 +51,7 @@ namespace Kolokwium1.Controllers
                         IdMedicament = (int)dr["IdMedicament"],
                         Type = dr["Type"].ToString()
                     };
-                    //  pres.MedicineList.Add(med);??? nie dziala lista !!!!
+                      pres.MedicineList.Add(med);//zabrakło czasu aby naprawic 
 
 
                 }
